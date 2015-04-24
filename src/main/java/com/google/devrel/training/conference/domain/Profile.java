@@ -1,5 +1,6 @@
 package com.google.devrel.training.conference.domain;
 
+import com.google.devrel.training.conference.form.ProfileForm;
 import com.google.devrel.training.conference.form.ProfileForm.TeeShirtSize;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -50,4 +51,12 @@ public class Profile {
      */
     private Profile() {}
 
+	public void update(String displayName, TeeShirtSize teeShirtSize) {
+		if (displayName != null) {
+			this.displayName = displayName;
+		}
+		if (teeShirtSize != null) {
+			this.teeShirtSize = teeShirtSize;
+		}
+	}
 }
