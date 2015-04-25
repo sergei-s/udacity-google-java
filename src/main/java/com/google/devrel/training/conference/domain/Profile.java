@@ -1,9 +1,13 @@
 package com.google.devrel.training.conference.domain;
 
+import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.devrel.training.conference.form.ProfileForm;
 import com.google.devrel.training.conference.form.ProfileForm.TeeShirtSize;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -11,6 +15,7 @@ public class Profile {
 	String displayName;
 	String mainEmail;
 	TeeShirtSize teeShirtSize;
+	private List<String> conferenceKeysToAttend = new ArrayList<>(0);
 
 	@Id
 	String userId;
@@ -57,6 +62,23 @@ public class Profile {
 		}
 		if (teeShirtSize != null) {
 			this.teeShirtSize = teeShirtSize;
+		}
+	}
+
+	public List<String> getConferenceKeysToAttend() {
+		return ImmutableList.copyOf(conferenceKeysToAttend);
+	}
+
+	public void addToConferenceKeysToAttend(String conferenceKey){
+		conferenceKeysToAttend.add(conferenceKey);
+	}
+
+	public void unregisterFromConference(String conferenceKey) {
+		if(conferenceKeysToAttend.contains(conferenceKey)) {
+			conferenceKeysToAttend.remove(conferenceKey);
+		}
+		else {
+			throw new IllegalArgumentException();
 		}
 	}
 }
