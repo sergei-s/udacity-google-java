@@ -24,6 +24,7 @@ import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -327,5 +328,36 @@ public class ConferenceApi {
         return result;
     }
 
+    /**
+     * Returns a collection of Conference Object that the user is going to attend.
+     *
+     * @param user An user who invokes this method, null when the user is not signed in.
+     * @return a Collection of Conferences that the user is going to attend.
+     * @throws UnauthorizedException when the User object is null.
+     */
+    @ApiMethod(
+            name = "getConferencesToAttend",
+            path = "getConferencesToAttend",
+            httpMethod = HttpMethod.GET
+    )
+    public Collection<Conference> getConferencesToAttend(final User user)
+            throws UnauthorizedException, NotFoundException {
+        // If not signed in, throw a 401 error.
+        if (user == null) {
+            throw new UnauthorizedException("Authorization required");
+        }
+        Profile profile = getProfileFromUser(user); // Change this;
+        if (profile == null) {
+            throw new NotFoundException("Profile doesn't exist.");
+        }
+
+        List<String> keyStringsToAttend = profile.getConferenceKeysToAttend();
+
+        List<Key<Conference>>  keys = new ArrayList<>();
+        for (String keyString : keyStringsToAttend) {
+            keys.add(Key.<Conference>create(keyString));
+        }
+        return ofy().load().keys(keys).values();
+    }
 
 }

@@ -169,7 +169,6 @@ public class ConferenceApiTest {
     }
 
 
-    /*
     @Test
     public void testCreateConference() throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -201,9 +200,8 @@ public class ConferenceApiTest {
         String displayName = EMAIL.substring(0, EMAIL.indexOf("@"));
         assertEquals(displayName, profile.getDisplayName());
     }
-    */
 
-    /*
+
     @Test
     public void testGetConferencesCreated() throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -222,9 +220,7 @@ public class ConferenceApiTest {
         assertTrue("The result should contain a conference",
                 conferencesCreated.contains(conference));
     }
-    */
 
-    /*
     @Test
     public void testGetConference() throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -250,9 +246,7 @@ public class ConferenceApiTest {
         assertEquals(CAP, conference.getSeatsAvailable());
         assertEquals(MONTH, conference.getMonth());
     }
-    */
 
-    /*
     @Test
     public void testRegistrations() throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -287,5 +281,5 @@ public class ConferenceApiTest {
         assertFalse("Profile shouldn't have the conferenceId in conferenceIdsToAttend.",
                 profile.getConferenceKeysToAttend().contains(conference.getWebsafeKey()));
     }
-    */
+
 }
