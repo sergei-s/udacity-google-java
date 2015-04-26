@@ -11,10 +11,16 @@ import com.google.api.server.spi.response.ConflictException;
 import com.google.api.server.spi.response.ForbiddenException;
 import com.google.api.server.spi.response.NotFoundException;
 import com.google.api.server.spi.response.UnauthorizedException;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.users.User;
 import com.google.devrel.training.conference.Constants;
 import com.google.devrel.training.conference.domain.Conference;
 import com.google.devrel.training.conference.domain.Profile;
+import com.google.devrel.training.conference.form.Announcement;
 import com.google.devrel.training.conference.form.ConferenceForm;
 import com.google.devrel.training.conference.form.ConferenceQueryForm;
 import com.google.devrel.training.conference.form.ProfileForm;
@@ -152,7 +158,9 @@ public class ConferenceApi {
         Profile profile = getProfileFromUser(user);
         Conference conference = new Conference(conferenceId, user.getUserId(), conferenceForm);
         ofy().save().entities(profile, conference).now();
-
+        Queue queue = QueueFactory.getQueue("email-queue");
+        queue.add(TaskOptions.Builder.withUrl("/crons/confirm-email").
+                param("email", profile.getMainEmail()).param("conferenceInfo", conference.toString()));
         return conference;
     }
 
@@ -268,8 +276,8 @@ public class ConferenceApi {
             httpMethod = HttpMethod.POST
     )
 
-    public WrappedBoolean registerForConference_SKELETON(final User user,
-                                                         @Named("websafeConferenceKey") final String websafeConferenceKey)
+    public WrappedBoolean registerForConference(final User user,
+                                                @Named("websafeConferenceKey") final String websafeConferenceKey)
             throws UnauthorizedException, NotFoundException,
             ForbiddenException, ConflictException {
         if (user == null) {
@@ -353,11 +361,16 @@ public class ConferenceApi {
 
         List<String> keyStringsToAttend = profile.getConferenceKeysToAttend();
 
-        List<Key<Conference>>  keys = new ArrayList<>();
+        List<Key<Conference>> keys = new ArrayList<>();
         for (String keyString : keyStringsToAttend) {
             keys.add(Key.<Conference>create(keyString));
         }
         return ofy().load().keys(keys).values();
+    }
+
+    public Announcement getAnnouncements() {
+        MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
+        return new Announcement((String) memcacheService.get(Constants.MEMCACHE_ANNOUNCEMENTS_KEY));
     }
 
 }
